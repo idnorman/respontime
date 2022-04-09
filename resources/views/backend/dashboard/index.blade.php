@@ -3,8 +3,10 @@
 @section('title', 'Dashboard')
 
 @section('content')
+
     <div class="row">
         @foreach ($pemeriksaans as $item)
+            @if(!$item->waktu_selesai)
             <div class="col-3">
                 <div class="small-box bg-info" id="box-{{ $item->id }}">
                     <div class="inner">
@@ -14,41 +16,72 @@
                     </div>
                 </div>
             </div>
+            @endif
         @endforeach
     </div>
 @endsection
 
 @push('script')
     <script>
-        let idBox = [];
-
+        
+        let pemeriksaan = {};
+        
         @foreach ($pemeriksaans as $item)
-            idBox.push('{{ $item->id }}')
+            @if(!$item->waktu_selesai)
+
+            pemeriksaan = {
+                ...pemeriksaan, 
+                ...{
+                    '{{ $item->id }}' : {
+                        'id' : {{ $item->id }},
+                        'created_at' : '{{$item->created_at->format('m/d/Y H:i:s')}}'
+                    }
+                }
+            };
+            @endif
         @endforeach
 
-        for (let i = 0; i < idBox.length; i++) {
-            var time = document.getElementById("time-" + idBox[i]);
+        setInterval(setTime, 1000);
 
-            console.log(time);
+        function setTime(){
+            $.each(pemeriksaan, function(index, value) {
 
-            var totalSeconds = 0;
-            setInterval(setTime, 1000);
+                let id = value['id'];
+                
+                //Waktu sekarang
+                let currTime = new Date();
 
-            function setTime() {
-                ++totalSeconds;
-                let minute = pad(parseInt(totalSeconds / 60));
-                let second = pad(totalSeconds % 60);
-                time.innerHTML = minute + ':' + second;
-            }
+                //Waktu mulai
+                let pastTime = new Date(value['created_at']);
 
-            function pad(val) {
-                var valString = val + "";
-                if (valString.length < 2) {
-                    return "0" + valString;
-                } else {
-                    return valString;
-                }
-            }
+                //Selisih waktu (dalam miliseconds)
+                let diff = currTime - pastTime;
+
+                //Konversi selisih(miliseconds) ke h(jam), m(menit), s(detik)
+                let h = Math.floor(diff/(1000 * 60 * 60));
+                diff -= h * (1000 * 60 * 60);
+
+                let m = Math.floor(diff/(1000 * 60));
+                diff -= m * (1000 * 60);
+
+                let s = Math.floor(diff/1000);
+
+                display(id, h, m, s);
+            });
         }
+
+        function display(id, h, m, s) {
+            var time = document.getElementById("time-" + id);
+            var h = Number(h);
+            var m = Number(m);
+            var s = Number(s);
+
+            var hDisplay = h > 0 ? (h<10 ? "0" + h + ":" : h + ":") : "00:";
+            var mDisplay = m > 0 ? (m<10 ? "0" + m + ":" : m + ":") : "00:";
+            var sDisplay = s > 0 ? (s<10 ? "0" + s : s ) : "00";
+
+            time.innerHTML = hDisplay + mDisplay + sDisplay;
+        }
+        
     </script>
 @endpush
