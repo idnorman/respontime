@@ -72,6 +72,7 @@
 
         function display(id, h, m, s) {
             var time = document.getElementById("time-" + id);
+      
             var h = Number(h);
             var m = Number(m);
             var s = Number(s);
@@ -79,7 +80,9 @@
             var hDisplay = h > 0 ? (h<10 ? "0" + h + ":" : h + ":") : "00:";
             var mDisplay = m > 0 ? (m<10 ? "0" + m + ":" : m + ":") : "00:";
             var sDisplay = s > 0 ? (s<10 ? "0" + s : s ) : "00";
-
+			
+			if (h > 0) $("#box-" + id).removeClass("bg-info").addClass("bg-danger");
+			
             time.innerHTML = hDisplay + mDisplay + sDisplay;
         }
         
