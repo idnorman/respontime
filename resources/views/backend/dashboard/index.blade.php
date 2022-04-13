@@ -67,7 +67,9 @@
                 let s = Math.floor(diff/1000);
 
                 display(id, h, m, s);
+                
             });
+            reload();
         }
 
         function display(id, h, m, s) {
@@ -84,6 +86,12 @@
 			if (h > 0) $("#box-" + id).removeClass("bg-info").addClass("bg-danger");
 			
             time.innerHTML = hDisplay + mDisplay + sDisplay;
+        }
+
+        function reload(){
+            let reload = localStorage.getItem('reload');
+            localStorage.removeItem('reload');
+            if(reload) window.location.reload();
         }
         
     </script>
